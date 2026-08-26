@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=82.0.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pqls"
+version = "0.1.0"
+description = "Parallel Quantum Liouvillian Solver: High-performance JAX-accelerated Lindblad solvers for quantum atomic systems."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "GPL-3.0-or-later"}
+authors = [
+    {name = "Evan Simanovskis", email = "evan.simanovskis@mail.utoronto.ca"},
+    {name = "Javane Rostampoor", email = "javane.rostampoor@utoronto.ca"},
+    {name = "Raviraj Adve", email = "rsadve@ece.utoronto.ca"}
+]
+keywords = ["quantum", "physics", "jax", "lindblad", "rydberg", "amo", "steady-state"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "ARC-Alkali-Rydberg-Calculator>=3.10.2",
+    "jax>=0.4.30",
+    "scipy>=1.17.1",
+    "numpy>=2.4.6"
+]
+
+[project.urls]
+Homepage = "https://github.com/Semyazi/pqls"
+Repository = "https://github.com/Semyazi/pqls.git"
+Issues = "https://github.com/Semyazi/pqls/issues"
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "sphinx-autodoc-typehints"
+]
+test = [
+    "pytest>=8.0.0",
+    "qutip>=5.0.0",
+    "matplotlib>=3.8.0"
+]
+dev = [
+    "pqls[test,docs]",
+    "ruff>=0.8.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 88
+src = ["src"]
+extend-exclude = ["old"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+ignore = ["E741", "E501"]
+
+[tool.ruff.format]
+quote-style = "double"
