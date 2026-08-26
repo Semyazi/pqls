@@ -154,3 +154,6 @@ The physical parameters, Rydberg transitions, and 2D parameter space provided in
 
 ## License
 PQLS is licensed under the **GPL-3.0 License**. See the `LICENSE` file for more details.
+
+## Citing PQLS
+If you use PQLS in your research, please click the "Cite this repository" button on the GitHub sidebar to generate the appropriate citation.

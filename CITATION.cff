@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it as below."
+authors:
+- family-names: "Simanovskis"
+  given-names: "Evan"
+- family-names: "Rostampoor"
+  given-names: "Javane"
+- family-names: "Adve"
+  given-names: "Raviraj"
+title: "PQLS: Parallel Quantum Liouvillian Solver"
+version: 0.1.0
+url: "https://github.com/Semyazi/pqls"
