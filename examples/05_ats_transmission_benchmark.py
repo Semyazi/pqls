@@ -1,5 +1,5 @@
 """
-04_ats_transmission_benchmark.py
+05_ats_transmission_benchmark.py
 
 Benchmarking central probe transmission (resonant driving, all detunings = 0 Hz)
 as a function of the RF Electric Field Amplitude (E_rf) across a logarithmic scale.
@@ -44,6 +44,8 @@ rabis_list = [Op, Oc, Orf_values]
 
 # Pre-compile the exact batch kernel to exclude JIT overhead
 _ = solve_ladder_system(detunings_list, rabis_list, gammas, coherence_index=0)
+if hasattr(_, "block_until_ready"):
+    _.block_until_ready()
 
 # Execution & Benchmarking
 print(f"Running ATS Transmission Benchmark ({sweep_points} points)...")
@@ -51,6 +53,11 @@ print(f"Running ATS Transmission Benchmark ({sweep_points} points)...")
 # Time PQLS
 t0_jax = time.perf_counter()
 coh_jax = solve_ladder_system(detunings_list, rabis_list, gammas, coherence_index=0)
+
+# Block async JAX dispatch to get true wall-clock time
+if hasattr(coh_jax, "block_until_ready"):
+    coh_jax = coh_jax.block_until_ready()
+
 jax_time = time.perf_counter() - t0_jax
 
 # Time QuTiP

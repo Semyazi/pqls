@@ -1,5 +1,5 @@
 """
-05_heatmap.py
+06_heatmap.py
 
 5-level Rydberg Autler-Townes probe transmission heatmap simulation demonstrating vectorized 2D parameter sweeps
 (Interference Field vs. Coupling Detuning) comparing the presence and absence of an RF Local Oscillator.
@@ -70,6 +70,8 @@ coh_baseline = solve_ladder_system(
     gammas=gammas,
     coherence_index=0,
 )
+if hasattr(coh_baseline, "block_until_ready"):
+    coh_baseline = coh_baseline.block_until_ready()
 max_signal_off = float(np.exp(normalization_constant * coh_baseline).max())
 
 # 2D Mesh Setup
@@ -91,6 +93,8 @@ _ = solve_ladder_system(
     gammas=gammas,
     coherence_index=0,
 )
+if hasattr(_, "block_until_ready"):
+    _.block_until_ready()
 
 # Case A - No RF
 t0 = time.perf_counter()
@@ -100,6 +104,8 @@ coh_no_rf = solve_ladder_system(
     gammas=gammas,
     coherence_index=0,
 )
+if hasattr(coh_no_rf, "block_until_ready"):
+    coh_no_rf = coh_no_rf.block_until_ready()
 time_no_rf = time.perf_counter() - t0
 
 # Case B - With RF
@@ -110,6 +116,8 @@ coh_rf = solve_ladder_system(
     gammas=gammas,
     coherence_index=0,
 )
+if hasattr(coh_rf, "block_until_ready"):
+    coh_rf = coh_rf.block_until_ready()
 time_rf = time.perf_counter() - t1
 
 print(

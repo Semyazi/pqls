@@ -102,12 +102,13 @@ In the `examples/` directory, we provide examples that demonstrate both the func
 * **`01_quickstart_ats.py`**: The minimal 4-level ladder simulation shown above.
 * **`02_custom_network.py`**: Demonstrates modeling arbitrary topologies (e.g., $\Lambda$-systems with branching decays and Coherent Population Trapping).
 * **`03_benchmark_ats.py`**: A direct performance and accuracy benchmark of PQLS against a serial QuTiP solver.
-* **`04_ats_transmission_benchmark.py`**: Central probe transmission benchmarking over a logarithmic RF sweep.
-* **`05_heatmap.py`**: A highly-optimized, fully vectorized 2D parameter sweep (10,000+ points) producing interference heatmaps.
+* **`04_benchmark_ats_rydiqule.py`**: A direct performance and accuracy benchmark of PQLS against Rydiqule.
+* **`05_ats_transmission_benchmark.py`**: Central probe transmission benchmarking over a logarithmic RF sweep.
+* **`06_heatmap.py`**: A highly-optimized, fully vectorized 2D parameter sweep (10,000+ points) producing interference heatmaps.
 
 Run any example directly from your terminal:
 ```bash
-python examples/05_heatmap.py
+python examples/06_heatmap.py
 ```
 
 ---

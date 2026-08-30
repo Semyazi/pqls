@@ -1,15 +1,15 @@
 """
-03_benchmark_ats.py
+04_benchmark_ats_rydiqule.py
 
 Autler-Townes splitting benchmark across multiple RF field strengths.
-Compares the batched PQLS Lindblad solver against a serial QuTiP baseline for speed and precision.
+Compares the batched PQLS Lindblad solver against a Rydiqule baseline for speed and precision.
 """
 
 import time
 
 import matplotlib.pyplot as plt
 import numpy as np
-from _qutip_reference import solve_steady_state_qt
+import rydiqule as rq
 
 from pqls.atoms import calculate_rabi_frequency, get_atom
 from pqls.lindblad import solve_ladder_system
@@ -45,7 +45,9 @@ sweep_points = 2000
 detunings_hz = np.linspace(-80e6, 80e6, sweep_points)
 detunings_list = [0.0, hz_to_rad_s(detunings_hz), 0.0]
 
-# Pre-compile the exact batch kernel to exclude JIT overhead
+print("Pre-compiling and warming up solvers to exclude cold-start overhead...")
+
+# Pre-compile the exact PQLS batch kernel to exclude JIT overhead
 _ = solve_ladder_system(
     detunings=[0.0, np.zeros(sweep_points), 0.0],
     rabis=[Op, Oc, 0.0],
@@ -55,11 +57,21 @@ _ = solve_ladder_system(
 if hasattr(_, "block_until_ready"):
     _.block_until_ready()
 
+# Pre-warm Rydiqule's NumPy/SciPy backends
+dummy_sensor = rq.Sensor(4)
+dummy_sensor.add_decoherence((1, 0), gammas[1])
+dummy_sensor.add_decoherence((2, 1), gammas[2])
+dummy_sensor.add_decoherence((3, 2), gammas[3])
+dummy_sensor.add_coupling(states=(0, 1), rabi_frequency=Op, detuning=0.0)
+dummy_sensor.add_coupling(states=(1, 2), rabi_frequency=Oc, detuning=0.0)
+dummy_sensor.add_coupling(states=(2, 3), rabi_frequency=1.0, detuning=0.0)
+_ = rq.solve_steady_state(dummy_sensor)
+
 fig, axes = plt.subplots(
     1, 3, figsize=(15, 5), sharex=True, sharey=True, layout="constrained"
 )
 
-print("Running ATS Multi-Field Benchmarks (QuTiP vs. PQLS)...")
+print("Running ATS Multi-Field Benchmarks (Rydiqule vs. PQLS)...")
 
 for ax, cond in zip(axes, rf_conditions, strict=True):
     E_rf = cond["E_rf"]
@@ -77,24 +89,46 @@ for ax, cond in zip(axes, rf_conditions, strict=True):
 
     jax_time = time.perf_counter() - t0_jax
 
-    # Time QuTiP
-    t0_qt = time.perf_counter()
-    coh_qt = solve_steady_state_qt(*detunings_list, *rabis_list, gammas)
-    qt_time = time.perf_counter() - t0_qt
+    # Time Rydiqule
+    sensor = rq.Sensor(4)
+    sensor.add_decoherence((1, 0), gammas[1])
+    sensor.add_decoherence((2, 1), gammas[2])
+    sensor.add_decoherence((3, 2), gammas[3])
+    sensor.add_coupling(
+        states=(0, 1), rabi_frequency=rabis_list[0], detuning=detunings_list[0]
+    )
+    sensor.add_coupling(
+        states=(1, 2), rabi_frequency=rabis_list[1], detuning=detunings_list[1]
+    )
+    sensor.add_coupling(
+        states=(2, 3), rabi_frequency=rabis_list[2], detuning=detunings_list[2]
+    )
+
+    t0_ryd = time.perf_counter()
+    sol = rq.solve_steady_state(sensor)
+    ryd_time = time.perf_counter() - t0_ryd
+
+    coh_ryd = np.imag(sol.complex_rho[..., 1, 0])
 
     # Verification Metrics
-    speedup = qt_time / jax_time if jax_time > 0 else 1.0
-    max_diff = float(np.max(np.abs(coh_qt - coh_jax)))
+    speedup = ryd_time / jax_time if jax_time > 0 else 1.0
+    max_diff = float(np.max(np.abs(coh_ryd - coh_jax)))
 
     # Convert density matrix coherence into transmission
-    trans_qt = np.exp(normalization_constant * coh_qt)
+    trans_ryd = np.exp(normalization_constant * coh_ryd)
     trans_jax = np.exp(normalization_constant * coh_jax)
 
     print(
-        f"|-- E_rf = {E_rf:3.1f} V/m | QuTiP: {qt_time:.3f}s | PQLS: {jax_time * 1000:.1f}ms | Speedup: {speedup:5.0f}x | Max Error: {max_diff:.2e}"
+        f"|-- E_rf = {E_rf:3.1f} V/m | Rydiqule: {ryd_time * 1000:5.1f} ms | PQLS: {jax_time * 1000:5.1f} ms | Speedup: {speedup:5.2f}x | Max Error: {max_diff:.2e}"
     )
 
-    ax.plot(detunings_hz / 1e6, trans_qt, color="#1f77b4", lw=4.5, label="QuTiP")
+    ax.plot(
+        detunings_hz / 1e6,
+        trans_ryd,
+        color="#1f77b4",
+        lw=4.5,
+        label="Rydiqule",
+    )
     ax.plot(
         detunings_hz / 1e6,
         trans_jax,
@@ -109,10 +143,10 @@ for ax, cond in zip(axes, rf_conditions, strict=True):
 
     # Metric Annotation Card
     metrics_text = (
-        f"QuTiP  : {qt_time:.2f} s\n"
-        f"PQLS   : {jax_time * 1000:.1f} ms\n"
-        f"Speedup: {speedup:.0f}x\n"
-        f"Error  : {max_diff:.1e}"
+        f"Rydiqule: {ryd_time * 1000:.1f} ms\n"
+        f"PQLS    : {jax_time * 1000:.1f} ms\n"
+        f"Speedup : {speedup:.2f}x\n"
+        f"Error   : {max_diff:.1e}"
     )
     props = dict(
         boxstyle="round,pad=0.4", facecolor="#f5f5f5", edgecolor="#cccccc", alpha=0.9
