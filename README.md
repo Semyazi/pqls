@@ -143,9 +143,6 @@ pytest -vv -s
 To generate and view the API documentation locally (requires the `[docs]` or `[dev]` dependencies):
 
 ```bash
-# Generate the API documentation source files from the package root
-sphinx-apidoc -o docs/source src/pqls
-
 # Build the HTML documentation
 cd docs
 make html       # On Linux / macOS
