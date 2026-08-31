@@ -73,19 +73,19 @@ def _extract_output(
 
 
 def _solve_steady_state_single(H: jnp.ndarray, C_ops: jnp.ndarray) -> jnp.ndarray:
-    """Solves the steady-state Lindblad master equation for an unbatched system.
+    r"""Solves the steady-state Lindblad master equation for an unbatched system.
 
     Parameters
     ----------
     H : jnp.ndarray
-        Hamiltonian matrix of shape (N, N).
+        Hamiltonian matrix of shape ``(N, N)``.
     C_ops : jnp.ndarray
-        Stack of collapse/jump operators of shape (K, N, N).
+        Stack of collapse/jump operators of shape ``(K, N, N)``.
 
     Returns
     -------
     jnp.ndarray
-        Steady-state density matrix rho_ss of shape (N, N) with unit trace.
+        Steady-state density matrix :math:`\rho_{ss}` of shape ``(N, N)`` with unit trace.
     """
 
     N = H.shape[0]
@@ -151,8 +151,19 @@ _compiled_batched_ladder = jax.jit(
 
 
 def solve_steady_state(hamiltonian: np.ndarray, c_ops: np.ndarray) -> np.ndarray:
-    """
-    Solve for the steady state given the Hamiltonian & collapse operators.
+    r"""Solves for the steady state given the Hamiltonian and collapse operators.
+
+    Parameters
+    ----------
+    hamiltonian : np.ndarray
+        Hamiltonian matrix of shape ``(N, N)`` or batched ``(B, N, N)``.
+    c_ops : np.ndarray
+        Stack of collapse operators of shape ``(K, N, N)``. These are shared across the batch.
+
+    Returns
+    -------
+    np.ndarray
+        Steady-state density matrix :math:`\rho_{ss}` of shape ``(N, N)`` or ``(B, N, N)``.
     """
     if hamiltonian.ndim == 2:
         # Single unbatched matrix solve
@@ -172,13 +183,30 @@ def solve_custom_network(
     n_levels: int,
     coherence_index: int | None = None,
 ) -> ArrayOrScalar:
-    """Solve steady state for an arbitrary transition network.
+    r"""Solves the steady state for an arbitrary transition network.
 
     Parameters
     ----------
+    transitions : list of tuple of (int, int)
+        List of coupled transitions represented as ``(from_state, to_state)`` indices.
+    decays : list of tuple of (int, int, float)
+        List of decay channels represented as ``(from_state, to_state, gamma)``.
+    detunings : list of ArrayOrScalar
+        List of detunings for each transition in ``rad/s``.
+        Each scalar will be held constant throughout the batch.
+    rabis : list of ArrayOrScalar
+        List of angular Rabi frequencies for each transition in ``rad/s``.
+        Each scalar will be held constant throughout the batch.
+    n_levels : int
+        Total number of levels :math:`N` in the system.
     coherence_index : int, optional
-        If specified (e.g. `0`, `1`), returns `Im(rho)` for `transitions[coherence_index]`.
-        If `None` (default), returns the full density matrix batch of shape `(Batch, N, N)`.
+        If specified (e.g., ``0``, ``1``), returns :math:`\text{Im}(\rho)` for ``transitions[coherence_index]``.
+        If ``None``, returns the full density matrix batch of shape ``(Batch, N, N)``.
+
+    Returns
+    -------
+    ArrayOrScalar
+        Extracted coherence or full steady-state density matrix.
     """
 
     num_dets = len(detunings)
@@ -219,7 +247,27 @@ def solve_ladder_system(
     gammas: list[float],
     coherence_index: int | None = 0,
 ) -> ArrayOrScalar:
-    """Solve steady state for an N-level ladder system at native XLA speed."""
+    r"""Solves the steady state for an :math:`N`-level ladder system.
+
+    Parameters
+    ----------
+    detunings : list of ArrayOrScalar
+        List of detunings for each adjacent transition in ``rad/s``.
+        Each scalar will be held constant throughout the batch.
+    rabis : list of ArrayOrScalar
+        List of angular Rabi frequencies for each adjacent transition in ``rad/s``.
+        Each scalar will be held constant throughout the batch.
+    gammas : list of float
+        List of decay rates :math:`\Gamma` for each level in ``rad/s``. Note that ``gammas[0]`` is typically ``0.0``.
+    coherence_index : int, optional
+        Index of the transition to extract the coherence :math:`\text{Im}(\rho)` from. Defaults to ``0``.
+        If ``None``, returns the full density matrix.
+
+    Returns
+    -------
+    ArrayOrScalar
+        Extracted coherence or full steady-state density matrix.
+    """
     N = len(rabis) + 1
     num_dets = len(detunings)
     all_bcast = np.broadcast_arrays(*detunings, *rabis)
@@ -252,7 +300,41 @@ def solve_quantum_ladder(
     max_n: int = 80,
     coherence_index: int | None = 0,
 ) -> ArrayOrScalar:
-    """Solves the steady-state for a physical atomic ladder system using ARC and JAX."""
+    r"""Solves the steady-state for a physical atomic ladder system using ARC and JAX.
+
+    Parameters
+    ----------
+    ladder : QuantumLadder
+        The quantum ladder system defining the atomic levels and transitions.
+    drivers : Sequence of Driver
+        Sequence of electromagnetic drivers for each transition.
+    detunings : Sequence of ArrayOrScalar or None, optional
+        Overriding detunings in ``Hz``. If provided, overrides driver settings.
+        Each scalar will be held constant throughout the batch.
+    frequencies : Sequence of ArrayOrScalar or None, optional
+        Overriding drive frequencies :math:`f` in ``Hz``. If provided, overrides driver settings.
+        Each scalar will be held constant throughout the batch.
+    amplitudes : Sequence of ArrayOrScalar or None, optional
+        Overriding electric field amplitudes :math:`E` in ``V/m``. If provided, overrides driver settings.
+        Each scalar will be held constant throughout the batch.
+    temperature : float, default=300.0
+        Environmental temperature in Kelvin for blackbody decay calculations.
+    max_n : int, default=80
+        Maximum principal quantum number :math:`n` to consider for decay pathways in ARC.
+    coherence_index : int, optional
+        Index of the transition to extract the coherence :math:`\text{Im}(\rho)` from. Defaults to ``0``.
+        If ``None``, returns the full density matrix.
+
+    Returns
+    -------
+    ArrayOrScalar
+        Extracted coherence or full steady-state density matrix.
+
+    Raises
+    ------
+    ValueError
+        If the number of drivers does not match the number of transitions in the ladder.
+    """
     n_transitions = ladder.num_transitions
     n_levels = ladder.num_levels
 

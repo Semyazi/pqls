@@ -26,14 +26,20 @@ _ATOM_MAP = {
 def get_atom(atom_name: AtomName) -> AtomType:
     """Returns a cached instance of the requested atom from the ARC package.
 
-    Args:
-        atom_name (AtomName): The common name of the atom (e.g., 'Rb85', 'Cs').
+    Parameters
+    ----------
+    atom_name : AtomName
+        The common name of the atom (e.g., 'Rb85', 'Cs').
 
-    Returns:
+    Returns
+    -------
+    AtomType
         The instantiated atom object from the ARC library.
 
-    Raises:
-        ValueError: If the provided atom_name is not in the supported list.
+    Raises
+    ------
+    ValueError
+        If the provided atom_name is not in the supported list.
     """
     atom_cls = _ATOM_MAP.get(atom_name.lower())
     if atom_cls is None:
@@ -44,11 +50,15 @@ def get_atom(atom_name: AtomName) -> AtomType:
 def get_ground_state(atom_name: AtomName) -> AtomicLevel:
     """Returns the ground state of the specified atom.
 
-    Args:
-        atom_name (AtomName): The common name of the atom.
+    Parameters
+    ----------
+    atom_name : AtomName
+        The common name of the atom.
 
-    Returns:
-        AtomicLevel: An object representing the n, l, and j quantum numbers
+    Returns
+    -------
+    AtomicLevel
+        An object representing the ``n``, ``l``, and ``j`` quantum numbers
         of the ground state.
     """
     arc_atom = get_atom(atom_name)
@@ -62,7 +72,7 @@ def calculate_rabi_frequency[T: ArrayOrScalar](
     e_field: T,
     q: int | None = None,
 ) -> T:
-    """Calculates angular Rabi frequency (rad/s) between two atomic states for a given electric field.
+    r"""Calculates angular Rabi frequency (``rad/s``) between two atomic states for a given electric field.
 
     Parameters
     ----------
@@ -73,15 +83,15 @@ def calculate_rabi_frequency[T: ArrayOrScalar](
     upper : QuantumState
         Target / upper energy state.
     e_field : ArrayOrScalar
-        Electric field amplitude in V/m (scalar or array).
+        Electric field amplitude in ``V/m`` (scalar or array).
     q : int, optional
-        Laser polarization transition (-1 for sigma-, 0 for pi, +1 for sigma+).
-        If None, inferred automatically from delta m_j.
+        Laser polarization transition (``-1`` for :math:`\sigma^-`, ``0`` for :math:`\pi`, ``+1`` for :math:`\sigma^+`).
+        If None, inferred automatically from :math:`\Delta m_j`.
 
     Returns
     -------
     ArrayOrScalar
-        Angular Rabi frequency Omega in rad/s matching the shape of `e_field`.
+        Angular Rabi frequency :math:`\Omega` in ``rad/s`` matching the shape of `e_field`.
     """
     arc_atom = get_atom(atom)
 

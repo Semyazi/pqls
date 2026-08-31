@@ -21,13 +21,16 @@ type AtomName = Literal["Rb85", "Rb87", "Cs", "rb85", "rb87", "cs"]
 
 @dataclass(frozen=True)
 class AtomicLevel:
-    """
-    Fine-structure atomic energy level.
+    r"""Fine-structure atomic energy level.
 
-    Attributes:
-        n: Principal quantum number.
-        l: Orbital angular momentum (0=S, 1=P, 2=D, 3=F, ...).
-        j: Total angular momentum (l + s).
+    Parameters
+    ----------
+    n : int
+        Principal quantum number :math:`n`.
+    l : int
+        Orbital angular momentum quantum number :math:`l` (``0 = S``, ``1 = P``, ``2 = D``, ``3 = F``, ...).
+    j : float
+        Total angular momentum quantum number :math:`j = l + s`.
     """
 
     n: int
@@ -35,7 +38,7 @@ class AtomicLevel:
     j: float
 
     def __str__(self) -> str:
-        """Spectroscopic notation (e.g., 5S_{1/2}, 5P_{3/2}, 50D_{5/2})."""
+        """Spectroscopic notation (e.g., ``5S_{1/2}``, ``5P_{3/2}``, ``50D_{5/2}``)."""
         l_symbols = ["S", "P", "D", "F", "G", "H"]
         l_str = l_symbols[self.l] if self.l < len(l_symbols) else f"l={self.l}"
 
@@ -45,24 +48,45 @@ class AtomicLevel:
         return f"{self.n}{l_str}_{{{j_str}}}"
 
     def to_arc_args(self) -> tuple[int, int, float]:
-        """Returns the argument tuple required by ARC: (n, l, j)."""
+        """Returns the argument tuple required by ARC.
+
+        Returns
+        -------
+        tuple of (int, int, float)
+            Tuple of quantum numbers ``(n, l, j)``.
+        """
         return (self.n, self.l, self.j)
 
     def to_arc_args_mj(self, mj: float) -> tuple[int, int, float, float]:
-        """Returns the argument tuple required by ARC with magnetic sub-level: (n, l, j, mj)."""
+        r"""Returns the argument tuple required by ARC with magnetic sub-level.
+
+        Parameters
+        ----------
+        mj : float
+            Magnetic quantum number :math:`m_j`.
+
+        Returns
+        -------
+        tuple of (int, int, float, float)
+            Tuple of quantum numbers ``(n, l, j, mj)``.
+        """
         return (self.n, self.l, self.j, mj)
 
 
 @dataclass(frozen=True)
 class QuantumState:
-    """
-    Fully resolved atomic quantum state including magnetic quantum number.
+    r"""Atomic quantum state including magnetic quantum number.
 
-    Attributes:
-        n: Principal quantum number.
-        l: Orbital angular momentum.
-        j: Total angular momentum.
-        mj: Magnetic quantum number.
+    Parameters
+    ----------
+    n : int
+        Principal quantum number :math:`n`.
+    l : int
+        Orbital angular momentum quantum number :math:`l`.
+    j : float
+        Total angular momentum quantum number :math:`j`.
+    mj : float
+        Magnetic quantum number :math:`m_j`.
     """
 
     n: int
@@ -72,25 +96,61 @@ class QuantumState:
 
     @property
     def level(self) -> AtomicLevel:
-        """Underlying fine-structure level (n, l, j)."""
+        """Underlying fine-structure level ``(n, l, j)``.
+
+        Returns
+        -------
+        AtomicLevel
+            The base atomic level without magnetic sub-level.
+        """
         return AtomicLevel(n=self.n, l=self.l, j=self.j)
 
     @classmethod
     def from_level(cls, level: AtomicLevel, mj: float) -> Self:
-        """Constructs QuantumState from an AtomicLevel and mj value."""
+        r"""Constructs a QuantumState from an AtomicLevel and :math:`m_j` value.
+
+        Parameters
+        ----------
+        level : AtomicLevel
+            Underlying fine-structure level.
+        mj : float
+            Magnetic quantum number :math:`m_j`.
+
+        Returns
+        -------
+        QuantumState
+            Instantiated quantum state.
+        """
         return cls(n=level.n, l=level.l, j=level.j, mj=mj)
 
     @classmethod
     def from_tuple(cls, t: tuple[int, int, float, float]) -> Self:
-        """Constructs QuantumState from an (n, l, j, mj) tuple."""
+        """Constructs a QuantumState from an ``(n, l, j, mj)`` tuple.
+
+        Parameters
+        ----------
+        t : tuple of (int, int, float, float)
+            Tuple containing ``(n, l, j, mj)``.
+
+        Returns
+        -------
+        QuantumState
+            Instantiated quantum state.
+        """
         return cls(*t)
 
     def to_arc_args(self) -> tuple[int, int, float, float]:
-        """Returns the argument tuple required by ARC: (n, l, j, mj)."""
+        """Returns the argument tuple required by ARC.
+
+        Returns
+        -------
+        tuple of (int, int, float, float)
+            Tuple of quantum numbers ``(n, l, j, mj)``.
+        """
         return (self.n, self.l, self.j, self.mj)
 
     def __str__(self) -> str:
-        """Spectroscopic notation with mj (e.g., 5S_{1/2}, mj=1/2)."""
+        r"""Spectroscopic notation with :math:`m_j` (e.g., ``5S_{1/2}, mj=1/2``)."""
         mj_fractions = {
             0.5: "1/2",
             -0.5: "-1/2",
@@ -105,12 +165,14 @@ class QuantumState:
 
 @dataclass(frozen=True)
 class QuantumLadder:
-    """
-    Arbitrary N-level ladder system.
+    r"""Arbitrary :math:`N`-level ladder system.
 
-    Attributes:
-        atom: Target alkali species
-        states: Sequence of QuantumStates ordered from ground state upward.
+    Parameters
+    ----------
+    atom : AtomName
+        Target alkali species.
+    states : Sequence[QuantumState]
+        Sequence of quantum states ordered from ground state upward.
     """
 
     atom: AtomName
@@ -124,25 +186,28 @@ class QuantumLadder:
 
     @property
     def num_levels(self) -> int:
-        """Total number of levels in the ladder system."""
+        r"""Total number of levels :math:`N` in the ladder system."""
         return len(self.states)
 
     @property
     def num_transitions(self) -> int:
-        """Total number of adjacent driving transitions (N - 1)."""
+        r"""Total number of adjacent driving transitions (:math:`N - 1`)."""
         return len(self.states) - 1
 
 
 @dataclass(frozen=True)
 class Driver:
-    """
-    Laser or RF electromagnetic field driving an atomic transition.
+    """Laser or RF electromagnetic field driving an atomic transition.
 
-    Attributes:
-        amplitude: Electric field amplitude in V/m.
-        frequency: Field frequency in Hz.
-        account_for_detuning: If True, calculates detuning relative to atomic resonance.
-                              If False, assumes resonant driving (detuning = 0.0).
+    Parameters
+    ----------
+    amplitude : float
+        Electric field amplitude in ``V/m``.
+    frequency : float, default=0.0
+        Field frequency in ``Hz``.
+    account_for_detuning : bool, default=False
+        If ``True``, calculates detuning relative to atomic resonance.
+        If ``False``, assumes resonant driving (detuning = ``0.0``).
     """
 
     amplitude: float

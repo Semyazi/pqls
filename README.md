@@ -140,14 +140,28 @@ pytest -vv -s
 
 ## Documentation
 
-To generate and view the project documentation locally (requires the `[docs]` dependencies):
-TODO
+To generate and view the API documentation locally (requires the `[docs]` or `[dev]` dependencies):
+
+```bash
+# Generate the API documentation source files from the package root
+sphinx-apidoc -o docs/source src/pqls
+
+# Build the HTML documentation
+cd docs
+make html       # On Linux / macOS
+# make.bat html # On Windows
+
+# Open the generated site in your browser
+# On macOS:   open build/html/index.html
+# On Linux:   xdg-open build/html/index.html
+# On Windows: explorer.exe build\html\index.html
+```
 
 ---
 
 ## Acknowledgments
 
-This project was developed by **Evan Simanovskis** under the supervision of **Javane Rostampoor** and **Prof. Raviraj Adve** at the University of Toronto. 
+This project was developed by **Evan Simanovskis** under the supervision of **Javane Rostampoor** and **Raviraj Adve** at the University of Toronto. 
 
 The physical parameters, Rydberg transitions, and 2D parameter space provided in the heatmap example are adapted from their work on interference-resilient quantum receivers:
 
