@@ -1,5 +1,5 @@
 """
-06_heatmap.py
+03_heatmap.py
 
 5-level Rydberg Autler-Townes probe transmission heatmap simulation demonstrating vectorized 2D parameter sweeps
 (Interference Field vs. Coupling Detuning) comparing the presence and absence of an RF Local Oscillator.

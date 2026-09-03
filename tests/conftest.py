@@ -17,3 +17,9 @@ def tol_invariant() -> float:
 def tol_pos_def() -> float:
     """Noise floor for zero-eigenvalues in positive semi-definite verification."""
     return -1e-13
+
+
+@pytest.fixture(scope="session")
+def min_coherence() -> float:
+    """Minimum allowable coherence magnitude to ensure non-trivial quantum test states."""
+    return 1e-6

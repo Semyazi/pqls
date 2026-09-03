@@ -80,6 +80,7 @@ def test_raw_solve_steady_state_vs_qutip(
     tol_parity: float,
     tol_invariant: float,
     tol_pos_def: float,
+    min_coherence: float,
 ):
     """Verifies solve_steady_state against QuTiP across arbitrary random systems."""
     h, c_ops = generate_random_system(
@@ -90,11 +91,11 @@ def test_raw_solve_steady_state_vs_qutip(
     rho_jax = solve_steady_state(h, c_ops)
 
     # Parity with QuTiP
-    np.testing.assert_allclose(rho_jax, rho_qt, atol=tol_parity, rtol=tol_parity)
+    np.testing.assert_allclose(rho_jax, rho_qt, atol=tol_parity, rtol=0)
 
     # Physical Invariants: Unit Trace & Hermiticity
-    assert np.isclose(np.trace(rho_jax), 1.0, atol=tol_invariant)
-    np.testing.assert_allclose(rho_jax, rho_jax.conj().T, atol=tol_invariant)
+    assert np.isclose(np.trace(rho_jax), 1.0, atol=tol_invariant, rtol=0)
+    np.testing.assert_allclose(rho_jax, rho_jax.conj().T, atol=tol_invariant, rtol=0)
 
     # Physical Invariant: Positive Semi-Definiteness (all eigenvalues >= 0)
     eigenvalues = np.linalg.eigvalsh(rho_jax)
@@ -102,7 +103,7 @@ def test_raw_solve_steady_state_vs_qutip(
 
     # Verify non-trivial off-diagonal coherences exist (not just classical populations)
     off_diagonals = rho_jax[~np.eye(n_levels, dtype=bool)]
-    assert np.any(np.abs(off_diagonals) > 1e-6)
+    assert np.any(np.abs(off_diagonals) > min_coherence)
 
 
 @pytest.mark.parametrize("n_levels", [2, 3, 4])
@@ -136,13 +137,13 @@ def test_solve_steady_state_direct_batch_vs_qutip(
     rho_qt = np.stack(
         [solve_qutip_steady_state(h_batch[k], c_ops) for k in range(batch_size)], axis=0
     )
-    np.testing.assert_allclose(rho_pqls, rho_qt, atol=tol_parity, rtol=tol_parity)
+    np.testing.assert_allclose(rho_pqls, rho_qt, atol=tol_parity, rtol=0)
 
     # Enforce physical invariants across every batch slice
     for k in range(batch_size):
-        assert np.isclose(np.trace(rho_pqls[k]), 1.0, atol=tol_invariant)
+        assert np.isclose(np.trace(rho_pqls[k]), 1.0, atol=tol_invariant, rtol=0)
         np.testing.assert_allclose(
-            rho_pqls[k], rho_pqls[k].conj().T, atol=tol_invariant
+            rho_pqls[k], rho_pqls[k].conj().T, atol=tol_invariant, rtol=0
         )
         eigenvalues = np.linalg.eigvalsh(rho_pqls[k])
         assert np.all(eigenvalues >= tol_pos_def)
@@ -201,9 +202,7 @@ def test_ladder_system_vs_qutip(
     ]
 
     qt_res = np.array(qt_coherences[0]) if batch_size == 1 else np.array(qt_coherences)
-    np.testing.assert_allclose(
-        pqls_coherences, qt_res, atol=tol_parity, rtol=tol_parity
-    )
+    np.testing.assert_allclose(pqls_coherences, qt_res, atol=tol_parity, rtol=0)
 
 
 def test_coherence_index_out_of_bounds():
@@ -251,7 +250,7 @@ def test_solve_custom_network_vs_qutip(tol_parity: float):
     c1[1, 2] = np.sqrt(2.0e6)
 
     rho_qt = solve_qutip_steady_state(h_qt, [c0, c1])
-    np.testing.assert_allclose(rho_pqls, rho_qt, atol=tol_parity, rtol=tol_parity)
+    np.testing.assert_allclose(rho_pqls, rho_qt, atol=tol_parity, rtol=0)
 
     # Verify coherence extraction for both transitions
     coh_pqls_0 = solve_custom_network(
@@ -262,7 +261,7 @@ def test_solve_custom_network_vs_qutip(tol_parity: float):
         n_levels=n_levels,
         coherence_index=0,
     )
-    assert np.isclose(coh_pqls_0, np.imag(rho_qt[2, 0]), atol=tol_parity)
+    assert np.isclose(coh_pqls_0, np.imag(rho_qt[2, 0]), atol=tol_parity, rtol=0)
 
     coh_pqls_1 = solve_custom_network(
         transitions=transitions,
@@ -272,7 +271,7 @@ def test_solve_custom_network_vs_qutip(tol_parity: float):
         n_levels=n_levels,
         coherence_index=1,
     )
-    assert np.isclose(coh_pqls_1, np.imag(rho_qt[2, 1]), atol=tol_parity)
+    assert np.isclose(coh_pqls_1, np.imag(rho_qt[2, 1]), atol=tol_parity, rtol=0)
 
 
 def test_solve_quantum_ladder_validation_and_e2e(tol_parity: float):
@@ -337,9 +336,7 @@ def test_solve_quantum_ladder_validation_and_e2e(tol_parity: float):
         rho_ss = solve_qutip_steady_state(h_qt, c_ops)
         qt_coherences.append(np.imag(rho_ss[1, 0]))
 
-    np.testing.assert_allclose(
-        pqls_coherences, qt_coherences, atol=tol_parity, rtol=tol_parity
-    )
+    np.testing.assert_allclose(pqls_coherences, qt_coherences, atol=tol_parity, rtol=0)
 
 
 def test_solve_custom_network_batched_vs_qutip(
@@ -403,21 +400,19 @@ def test_solve_custom_network_batched_vs_qutip(
 
     rho_qt_batch = np.stack(qt_rho_list, axis=0)
 
+    np.testing.assert_allclose(rho_batch, rho_qt_batch, atol=tol_parity, rtol=0)
     np.testing.assert_allclose(
-        rho_batch, rho_qt_batch, atol=tol_parity, rtol=tol_parity
+        coh_0_pqls, np.imag(rho_qt_batch[:, 2, 0]), atol=tol_parity, rtol=0
     )
     np.testing.assert_allclose(
-        coh_0_pqls, np.imag(rho_qt_batch[:, 2, 0]), atol=tol_parity, rtol=tol_parity
-    )
-    np.testing.assert_allclose(
-        coh_1_pqls, np.imag(rho_qt_batch[:, 2, 1]), atol=tol_parity, rtol=tol_parity
+        coh_1_pqls, np.imag(rho_qt_batch[:, 2, 1]), atol=tol_parity, rtol=0
     )
 
     # Verify physical invariants across the entire sweep
     for k in range(n_points):
-        assert np.isclose(np.trace(rho_batch[k]), 1.0, atol=tol_invariant)
+        assert np.isclose(np.trace(rho_batch[k]), 1.0, atol=tol_invariant, rtol=0)
         np.testing.assert_allclose(
-            rho_batch[k], rho_batch[k].conj().T, atol=tol_invariant
+            rho_batch[k], rho_batch[k].conj().T, atol=tol_invariant, rtol=0
         )
         eigenvalues = np.linalg.eigvalsh(rho_batch[k])
         assert np.all(eigenvalues >= tol_pos_def)
@@ -447,7 +442,7 @@ def test_solve_quantum_ladder_parameter_sweeps_and_overrides_vs_qutip(
     h_qt_res = build_ladder_hamiltonian(np.array([0.0]), np.array([rabi_base]))
     rho_qt_res = solve_qutip_steady_state(h_qt_res, c_ops)
     np.testing.assert_allclose(
-        coh_default, np.imag(rho_qt_res[1, 0]), atol=tol_parity, rtol=tol_parity
+        coh_default, np.imag(rho_qt_res[1, 0]), atol=tol_parity, rtol=0
     )
 
     n_points_det = 15
@@ -467,9 +462,7 @@ def test_solve_quantum_ladder_parameter_sweeps_and_overrides_vs_qutip(
         qt_det_coherences.append(np.imag(rho_ss[1, 0]))
 
     assert coh_det.shape == (n_points_det,)
-    np.testing.assert_allclose(
-        coh_det, qt_det_coherences, atol=tol_parity, rtol=tol_parity
-    )
+    np.testing.assert_allclose(coh_det, qt_det_coherences, atol=tol_parity, rtol=0)
 
     n_points_amp = 10
     amp_sweep = np.linspace(0.5, 10.0, n_points_amp)
@@ -488,6 +481,4 @@ def test_solve_quantum_ladder_parameter_sweeps_and_overrides_vs_qutip(
         qt_amp_coherences.append(np.imag(rho_ss[1, 0]))
 
     assert coh_amp.shape == (n_points_amp,)
-    np.testing.assert_allclose(
-        coh_amp, qt_amp_coherences, atol=tol_parity, rtol=tol_parity
-    )
+    np.testing.assert_allclose(coh_amp, qt_amp_coherences, atol=tol_parity, rtol=0)
