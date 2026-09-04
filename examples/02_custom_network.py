@@ -5,6 +5,8 @@ Arbitrary transition network simulation demonstrating Coherent Population Trappi
 in a 3-level Lambda-system with custom branching decay pathways.
 """
 
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -48,4 +50,9 @@ plt.ylabel(r"Probe Absorption $[-\mathrm{Im}(\rho_{20})]$")
 plt.title(r"$^{87}\mathrm{Rb}$ Coherent Population Trapping ($\Lambda$-System)")
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
+
+os.makedirs("assets", exist_ok=True)
+save_path = "assets/02_custom_network.png"
+plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
 plt.show()

@@ -4,6 +4,8 @@
 Minimal 4-level Autler-Townes Splitting simulation using high-level ladder abstractions.
 """
 
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -34,4 +36,9 @@ plt.xlabel("Coupling Detuning (MHz)")
 plt.ylabel("Probe Transmission (a.u.)")
 plt.title(r"$^{85}\mathrm{Rb}$ Rydberg Electrometry: Autler-Townes Splitting")
 plt.grid(True)
+
+os.makedirs("assets", exist_ok=True)
+save_path = "assets/01_quickstart_ats.png"
+plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
 plt.show()

@@ -10,6 +10,7 @@ reproducing the 2D parameter space transmission heatmaps in Fig. 4(a) and Fig. 4
 All physical parameters, detunings, and decay rates directly mirror their implementation.
 """
 
+import os
 import time
 
 import matplotlib.pyplot as plt
@@ -165,5 +166,9 @@ cbar1.set_label(r"Normalized Probe Transmission $T$ (a.u.)", fontsize=11)
 
 for ax in axes:
     ax.tick_params(axis="both", which="major", labelsize=10)
+
+os.makedirs("assets", exist_ok=True)
+save_path = "assets/03_heatmap.png"
+fig.savefig(save_path, dpi=300, bbox_inches="tight")
 
 plt.show()
