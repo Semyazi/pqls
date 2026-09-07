@@ -217,7 +217,7 @@ props = dict(
     boxstyle="round,pad=0.5", facecolor="#f5f5f5", edgecolor="#cccccc", alpha=0.9
 )
 throughput_text = (
-    f"Peak Throughput (Systems/sec)\n"
+    f"Peak Throughput (sys/s)\n"
     f"-----------------------------\n"
     f"Rydiqule (CPU): {ryd_peak_throughput / 1e3:>6.1f} K\n"
     f"PQLS (CPU)    : {pqls_cpu_peak_throughput / 1e3:>6.1f} K\n"
@@ -238,7 +238,9 @@ ax.text(
 )
 
 os.makedirs("assets", exist_ok=True)
-save_path = "assets/05_benchmark_scalability.png"
-fig.savefig(save_path, dpi=300, bbox_inches="tight")
+png_path = "assets/05_benchmark_scalability.png"
+eps_path = "assets/05_benchmark_scalability.eps"
+fig.savefig(png_path, dpi=300, bbox_inches="tight")
+fig.savefig(eps_path, format="eps", bbox_inches="tight")
 
 plt.show()
