@@ -91,7 +91,7 @@ plt.grid(True)
 plt.show()
 ```
 
-![Quickstart](assets/01_quickstart_ats.png)
+![Quickstart](assets/01a_quickstart_ats.png)
 
 ---
 
@@ -99,16 +99,16 @@ plt.show()
 
 In the `examples/` directory, we provide examples that demonstrate both the functionality of PQLS and its performance.
 
-* **`01_quickstart_ats.py`**: The minimal 4-level ladder simulation shown above.
-* **`02_custom_network.py`**: Demonstrates modeling arbitrary topologies (e.g., $\Lambda$-systems with branching decays and Coherent Population Trapping).
-* **`03_benchmark_ats.py`**: A direct performance and accuracy benchmark of PQLS against a serial QuTiP solver.
-* **`04_benchmark_ats_rydiqule.py`**: A direct performance and accuracy benchmark of PQLS against Rydiqule.
-* **`05_ats_transmission_benchmark.py`**: Central probe transmission benchmarking over a logarithmic RF sweep.
-* **`06_heatmap.py`**: A highly-optimized, fully vectorized 2D parameter sweep (10,000+ points) producing interference heatmaps.
+* **`01a_quickstart_ats.py`**: The minimal 4-level ladder simulation shown above using the high-level API.
+* **`01b_quickstart_ats_low_level.py`**: The same ATS system built from scratch using the lowest-level matrix API.
+* **`02_custom_network.py`**: Demonstrates modeling arbitrary topologies (e.g., $\Lambda$-systems with branching decays and Coherent Population Trapping) using the mid-level API.
+* **`03_heatmap.py`**: A highly-optimized, fully vectorized 2D parameter sweep (10,000+ points) producing interference heatmaps.
+* **`04_benchmark_qutip.py`**: A direct performance and accuracy benchmark of PQLS against QuTiP and QuTiP-JAX.
+* **`05_benchmark_scalability.py`**: A log-log scalability benchmark evaluating PQLS execution times (CPU/GPU) against Rydiqule.
 
 Run any example directly from your terminal:
 ```bash
-python examples/06_heatmap.py
+python examples/03_heatmap.py
 ```
 
 ---

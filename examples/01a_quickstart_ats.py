@@ -1,5 +1,5 @@
 """
-01_quickstart_ats.py
+01a_quickstart_ats.py
 
 Minimal 4-level Autler-Townes Splitting simulation using high-level ladder abstractions.
 """
@@ -38,7 +38,7 @@ plt.title(r"$^{85}\mathrm{Rb}$ Rydberg Electrometry: Autler-Townes Splitting")
 plt.grid(True)
 
 os.makedirs("assets", exist_ok=True)
-save_path = "assets/01_quickstart_ats.png"
+save_path = "assets/01a_quickstart_ats.png"
 plt.savefig(save_path, dpi=300, bbox_inches="tight")
 
 plt.show()
