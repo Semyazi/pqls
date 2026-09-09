@@ -8,7 +8,8 @@ version = "0.1.0"
 description = "Parallel Quantum Liouvillian Solver: High-performance JAX-accelerated Lindblad solvers for quantum atomic systems."
 readme = "README.md"
 requires-python = ">=3.12"
-license = {text = "GPL-3.0-or-later"}
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 authors = [
     {name = "Evan Simanovskis", email = "evan.simanovskis@mail.utoronto.ca"},
     {name = "Javane Rostampoor", email = "javane.rostampoor@utoronto.ca"},
@@ -18,7 +19,6 @@ keywords = ["quantum", "physics", "jax", "lindblad", "rydberg", "amo", "steady-s
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Physics",
