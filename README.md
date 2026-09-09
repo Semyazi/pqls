@@ -27,20 +27,16 @@ By mapping Lindblad master equation steady-states to compiler-optimized tensor o
 PQLS requires **Python 3.12+**. We highly recommend installing the package inside a virtual environment to prevent dependency conflicts.
 
 ### Standard Installation (For Users)
-Clone the repository, create a virtual environment, and install the base package:
+Install PQLS directly from PyPI:
 
 ```bash
-# Clone the repository
-git clone https://github.com/Semyazi/pqls.git
-cd pqls
-
 # Set up and activate the virtual environment
 python3 -m venv .venv
 source .venv/bin/activate  # On Windows, use: .venv\Scripts\activate
 
-# Upgrade pip and install the package
+# Upgrade pip and install PQLS
 pip install --upgrade pip
-pip install .
+pip install pqls
 ```
 
 ### Developer Installation (For Contributors)
@@ -56,6 +52,11 @@ pip install -e ".[dev]"
 ## Quickstart
 
 Simulating an N-level atomic system is as simple as defining the states and providing the driving fields. PQLS automatically queries ARC for the physical atomic properties and constructs the Lindbladian.
+
+The Quickstart example also requires Matplotlib:
+
+```bash
+pip install matplotlib
 
 ```python
 import matplotlib.pyplot as plt
