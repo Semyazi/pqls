@@ -238,9 +238,8 @@ ax.text(
 )
 
 os.makedirs("assets", exist_ok=True)
-png_path = "assets/05_benchmark_scalability.png"
-eps_path = "assets/05_benchmark_scalability.eps"
-fig.savefig(png_path, dpi=300, bbox_inches="tight")
-fig.savefig(eps_path, format="eps", bbox_inches="tight")
+save_path = "assets/05_benchmark_scalability"
+fig.savefig(save_path + ".png", format="png", dpi=300, bbox_inches="tight")
+fig.savefig(save_path + ".eps", format="eps", dpi=300, bbox_inches="tight")
 
 plt.show()

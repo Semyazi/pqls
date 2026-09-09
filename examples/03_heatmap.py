@@ -168,7 +168,8 @@ for ax in axes:
     ax.tick_params(axis="both", which="major", labelsize=10)
 
 os.makedirs("assets", exist_ok=True)
-save_path = "assets/03_heatmap.png"
-fig.savefig(save_path, dpi=300, bbox_inches="tight")
+save_path = "assets/03_heatmap"
+fig.savefig(save_path + ".png", format="png", dpi=300, bbox_inches="tight")
+fig.savefig(save_path + ".eps", format="eps", dpi=300, bbox_inches="tight")
 
 plt.show()

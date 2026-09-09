@@ -52,7 +52,8 @@ plt.grid(True, alpha=0.3)
 plt.tight_layout()
 
 os.makedirs("assets", exist_ok=True)
-save_path = "assets/02_custom_network.png"
-plt.savefig(save_path, dpi=300, bbox_inches="tight")
+save_path = "assets/02_custom_network"
+plt.savefig(save_path + ".png", format="png", dpi=300, bbox_inches="tight")
+plt.savefig(save_path + ".eps", format="eps", dpi=300, bbox_inches="tight")
 
 plt.show()

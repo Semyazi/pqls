@@ -197,7 +197,8 @@ fig.suptitle(
 )
 
 os.makedirs("assets", exist_ok=True)
-save_path = "assets/04_benchmark_qutip.png"
-fig.savefig(save_path, dpi=300, bbox_inches="tight")
+save_path = "assets/04_benchmark_qutip"
+fig.savefig(save_path + ".png", format="png", dpi=300, bbox_inches="tight")
+fig.savefig(save_path + ".eps", format="eps", dpi=300, bbox_inches="tight")
 
 plt.show()

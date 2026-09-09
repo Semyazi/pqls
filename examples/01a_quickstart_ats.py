@@ -38,7 +38,8 @@ plt.title(r"$^{85}\mathrm{Rb}$ Rydberg Electrometry: Autler-Townes Splitting")
 plt.grid(True)
 
 os.makedirs("assets", exist_ok=True)
-save_path = "assets/01a_quickstart_ats.png"
-plt.savefig(save_path, dpi=300, bbox_inches="tight")
+save_path = "assets/01a_quickstart_ats"
+plt.savefig(save_path + ".png", format="png", dpi=300, bbox_inches="tight")
+plt.savefig(save_path + ".eps", format="eps", dpi=300, bbox_inches="tight")
 
 plt.show()
