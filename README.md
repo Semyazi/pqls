@@ -133,6 +133,18 @@ To run the test suite from a cloned PQLS repository, install the `[test]` or `[d
 python -m pip install -e ".[test]"
 ```
 
+Then run the tests:
+
+```bash
+# Standard test run
+pytest
+
+# Detailed view (shows individual parametrized test cases and batch sizes)
+pytest -v
+
+# Extra verbose (prints standard output and shows exact numerical diffs if a test fails)
+pytest -vv -s
+```
 ---
 
 ## Documentation
