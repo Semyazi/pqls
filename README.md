@@ -124,8 +124,16 @@ Furthermore, the test suite enforces strict quantum mechanical invariants across
 2. **Hermiticity:** $\rho = \rho^\dagger$
 3. **Positive Semi-Definiteness:** All eigenvalues $\ge 0$
 
+
 ### Running the Tests
-To run the test suite, ensure you have installed the `[dev]` or `[test]` dependencies, then run:
+
+To run the test suite from a cloned PQLS repository, install the `[test]` or `[dev]` dependencies first:
+
+```bash
+python -m pip install -e ".[test]"
+```
+
+Then run the tests:
 
 ```bash
 # Standard test run
@@ -137,7 +145,6 @@ pytest -v
 # Extra verbose (prints standard output and shows exact numerical diffs if a test fails)
 pytest -vv -s
 ```
-
 ---
 
 ## Documentation
