@@ -57,6 +57,7 @@ The Quickstart example also requires Matplotlib:
 
 ```bash
 pip install matplotlib
+```
 
 ```python
 import matplotlib.pyplot as plt
