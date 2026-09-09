@@ -4,16 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pqls"
-version = "0.1.1"
+version = "0.1.2"
 description = "Parallel Quantum Liouvillian Solver: High-performance JAX-accelerated Lindblad solvers for quantum atomic systems."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 authors = [
-    {name = "Evan Simanovskis", email = "evan.simanovskis@mail.utoronto.ca"},
-    {name = "Javane Rostampoor", email = "javane.rostampoor@utoronto.ca"},
-    {name = "Raviraj Adve", email = "rsadve@ece.utoronto.ca"}
+    {name = "Evan Simanovskis"},
+    {name = "Javane Rostampoor"},
+    {name = "Raviraj Adve"}
 ]
 keywords = ["quantum", "physics", "jax", "lindblad", "rydberg", "amo", "steady-state"]
 classifiers = [
